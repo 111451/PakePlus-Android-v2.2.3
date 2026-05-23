@@ -1,11 +1,1652 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus-Android</title>
-    </head>
-    <body>
-        <h1>PakePlus-Android</h1>
-    </body>
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>华强买瓜：互动视频版</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Noto Sans SC', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==================== 首页 - 高级感设计 ==================== */
+        .home-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+            transition: opacity 0.5s;
+        }
+
+        .home-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .home-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+        }
+
+        .home-subtitle {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 60px;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
+
+        .home-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .home-btn {
+            padding: 18px 60px;
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 4px;
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .home-btn:hover {
+            background: rgba(255,107,107,0.2);
+            border-color: #ff6b6b;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255,107,107,0.3);
+        }
+
+        .home-btn.primary {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            border: none;
+            font-weight: 500;
+        }
+
+        .home-btn.primary:hover {
+            box-shadow: 0 10px 30px rgba(255,107,107,0.5);
+        }
+
+        .home-stats {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            gap: 40px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .home-stat {
+            text-align: center;
+        }
+
+        .home-stat-value {
+            font-size: 24px;
+            color: #ff6b6b;
+            font-weight: 700;
+        }
+
+        /* ==================== 角色选择 ==================== */
+        .role-select {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .role-select.active {
+            display: flex;
+        }
+
+        .role-select-title {
+            font-size: 32px;
+            margin-bottom: 50px;
+            color: #fff;
+            letter-spacing: 4px;
+        }
+
+        .role-cards {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .role-card {
+            width: 240px;
+            padding: 40px 30px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #ffd93d);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .role-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .role-card:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,107,107,0.3);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .role-card .role-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+        }
+
+        .role-card .role-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .role-card .role-desc {
+            font-size: 14px;
+            color: #888;
+            line-height: 1.6;
+        }
+
+        .back-btn {
+            margin-top: 40px;
+            padding: 12px 40px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        /* ==================== 游戏界面 ==================== */
+        .game-screen {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .game-screen.active {
+            display: flex;
+        }
+
+        /* 顶部栏 */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            background: rgba(0,0,0,0.9);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .top-bar .title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #ff6b6b;
+            letter-spacing: 2px;
+        }
+
+        .top-bar .stats {
+            display: flex;
+            gap: 24px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .top-bar .stats span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .top-bar .stats .stat-value {
+            color: #ff6b6b;
+            font-weight: 700;
+        }
+
+        /* 视频区域 */
+        .video-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            position: relative;
+        }
+
+        #main-video {
+            max-width: 80%;
+            max-height: calc((100vh - 50px) * 0.8);
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* 选择面板 */
+        .choice-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.98));
+            padding: 60px 30px 30px;
+            transition: opacity 0.4s;
+        }
+
+        .choice-panel.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .choice-question {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: #fff;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .choice-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .choice-btn {
+            padding: 18px 24px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .choice-btn:hover {
+            background: rgba(255,107,107,0.15);
+            border-color: rgba(255,107,107,0.4);
+            transform: translateX(8px);
+        }
+
+        .choice-btn.selected {
+            background: rgba(255,107,107,0.2);
+            border-color: #ff6b6b;
+        }
+
+        .choice-btn.selected::after {
+            display: none;
+        }
+
+        .choice-btn .choice-number {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* 结局面板 */
+        .ending-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .ending-panel.active {
+            display: flex;
+        }
+
+        .ending-content {
+            text-align: center;
+            padding: 50px;
+            max-width: 500px;
+        }
+
+        .ending-badge {
+            font-size: 14px;
+            color: #ff6b6b;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .ending-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ending-description {
+            font-size: 18px;
+            color: #aaa;
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .ending-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .ending-btn {
+            padding: 14px 40px;
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+        }
+
+        .ending-btn:hover {
+            background: rgba(255,107,107,0.2);
+            border-color: #ff6b6b;
+            transform: translateY(-2px);
+        }
+
+        .ending-btn.primary {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            border: none;
+        }
+
+        .ending-btn.primary:hover {
+            box-shadow: 0 10px 30px rgba(255,107,107,0.4);
+        }
+
+        /* 成就面板 */
+        .achievement-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 150;
+            overflow-y: auto;
+        }
+
+        .achievement-panel.active {
+            display: flex;
+        }
+
+        .achievement-content {
+            padding: 50px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .achievement-title {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 40px;
+            letter-spacing: 4px;
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .achievement-item {
+            padding: 24px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .achievement-item.unlocked {
+            background: rgba(255,107,107,0.08);
+            border-color: rgba(255,107,107,0.3);
+        }
+
+        .achievement-item .ach-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .achievement-item .ach-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .achievement-item .ach-desc {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .achievement-item.locked {
+            opacity: 0.4;
+        }
+
+        .achievement-item.locked .ach-icon {
+            filter: grayscale(1);
+        }
+
+        .ach-close {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .ach-close-btn {
+            padding: 12px 40px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ach-close-btn:hover {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #ffd93d);
+            transition: width 0.5s;
+        }
+
+        /* 成就弹出提示 */
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30,30,30,0.95);
+            border: 1px solid rgba(255,107,107,0.3);
+            border-radius: 16px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 500;
+            transform: translateX(400px);
+            transition: transform 0.5s;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .achievement-popup.show {
+            transform: translateX(0);
+        }
+
+        .achievement-popup .popup-icon {
+            font-size: 32px;
+        }
+
+        .achievement-popup .popup-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .achievement-popup .popup-title {
+            font-size: 14px;
+            color: #ff6b6b;
+            margin-bottom: 4px;
+        }
+
+        .achievement-popup .popup-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* ==================== 视频控制按钮 ==================== */
+        .video-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .video-container:hover .video-controls {
+            opacity: 1;
+        }
+
+        .video-controls.always-show {
+            opacity: 1;
+        }
+
+        .ctrl-btn {
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(255,107,107,0.3);
+            border-color: rgba(255,107,107,0.5);
+            transform: translateY(-2px);
+        }
+
+        .ctrl-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ctrl-btn:disabled:hover {
+            background: rgba(0,0,0,0.7);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .ctrl-btn .ctrl-icon {
+            font-size: 16px;
+        }
+
+        /* 选择面板 - 回退按钮 */
+        .choice-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .choice-question {
+            text-align: center;
+            font-size: 20px;
+            color: #fff;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .back-step-btn {
+            position: absolute;
+            left: 0;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            color: #aaa;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .back-step-btn:hover {
+            background: rgba(255,107,107,0.15);
+            border-color: rgba(255,107,107,0.4);
+            color: #ff6b6b;
+        }
+
+        .back-step-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .back-step-btn:disabled:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.15);
+            color: #aaa;
+        }
+
+        /* 已选标记样式增强 */
+        .choice-btn.selected {
+            background: rgba(255,107,107,0.15);
+            border-color: rgba(255,107,107,0.5);
+        }
+
+        .choice-btn.selected .choice-number {
+            background: rgba(255,107,107,0.3);
+        }
+
+        .choice-btn .selected-tag {
+            margin-left: auto;
+            font-size: 12px;
+            color: #ff6b6b;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== 首页 ==================== -->
+    <div class="home-screen" id="home-screen">
+        <div class="home-title">华强买瓜</div>
+        <div class="home-subtitle">互动视频版</div>
+        <div class="home-buttons">
+            <button class="home-btn primary" id="btn-start">开始游戏</button>
+            <button class="home-btn" id="btn-achievements">成就系统</button>
+            <button class="home-btn" id="btn-reset">重置进度</button>
+        </div>
+        <div class="home-stats">
+            <div class="home-stat">
+                <div class="home-stat-value" id="home-ending-count">0</div>
+                <div>已解锁结局</div>
+            </div>
+            <div class="home-stat">
+                <div class="home-stat-value" id="home-achievement-count">0</div>
+                <div>已解锁成就</div>
+            </div>
+            <div class="home-stat">
+                <div class="home-stat-value" id="home-play-count">0</div>
+                <div>游戏次数</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 角色选择 ==================== -->
+    <div class="role-select" id="role-select">
+        <div class="role-select-title">选择你的角色</div>
+        <div class="role-cards">
+            <div class="role-card" data-role="huaqiang">
+                <div class="role-icon">🔪</div>
+                <div class="role-name">华强报仇记</div>
+                <div class="role-desc">化身华强，手持利刃<br>为兄弟报仇雪恨</div>
+            </div>
+            <div class="role-card" data-role="boss">
+                <div class="role-icon">🍉</div>
+                <div class="role-name">老板自卫记</div>
+                <div class="role-desc">扮演瓜贩，机智应对<br>化解危机保全自己</div>
+            </div>
+            <div class="role-card" data-role="bro">
+                <div class="role-icon">🤝</div>
+                <div class="role-name">小弟助攻记</div>
+                <div class="role-desc">作为小弟，关键时刻<br>出手相助扭转乾坤</div>
+            </div>
+        </div>
+        <button class="back-btn" id="btn-back">返回</button>
+    </div>
+
+    <!-- ==================== 游戏界面 ==================== -->
+    <div class="game-screen" id="game-screen">
+        <div class="top-bar">
+            <div class="title">华强买瓜</div>
+            <div class="stats">
+                <span>故事：<span class="stat-value" id="current-story">未选择</span></span>
+                <span>结局：<span class="stat-value" id="ending-count">0/15</span></span>
+                <span>成就：<span class="stat-value" id="achievement-count">0/10</span></span>
+            </div>
+        </div>
+
+        <div class="video-container">
+            <video id="main-video" playsinline></video>
+            <div class="progress-bar" id="progress-bar"></div>
+
+            <div class="video-controls" id="video-controls">
+                <button class="ctrl-btn" id="btn-skip" title="跳过剧情">
+                    <span class="ctrl-icon">⏭</span> 跳过
+                </button>
+                <button class="ctrl-btn" id="btn-back-step-video" title="回到上一步" disabled>
+                    <span class="ctrl-icon">↩</span> 上一步
+                </button>
+            </div>
+            
+            <div class="choice-panel hidden" id="choice-panel">
+                <div class="choice-header">
+                    <button class="back-step-btn" id="btn-back-step" disabled>
+                        <span>↩</span> 上一步
+                    </button>
+                    <div class="choice-question" id="choice-question">请选择...</div>
+                </div>
+                <div class="choice-buttons" id="choice-buttons"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 结局面板 ==================== -->
+    <div class="ending-panel" id="ending-panel">
+        <div class="ending-content">
+            <div class="ending-badge">结局达成</div>
+            <div class="ending-title" id="ending-title">结局名称</div>
+            <div class="ending-description" id="ending-description">结局描述</div>
+            <div class="ending-buttons">
+                <button class="ending-btn primary" id="btn-restart">再来一次</button>
+                <button class="ending-btn" id="btn-menu">返回菜单</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 成就面板 ==================== -->
+    <div class="achievement-panel" id="achievement-panel">
+        <div class="achievement-content">
+            <div class="achievement-title">🏆 成就系统</div>
+            <div class="achievement-grid" id="achievement-grid"></div>
+            <div class="ach-close">
+                <button class="ach-close-btn" id="btn-ach-close">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 成就弹出提示 ==================== -->
+    <div class="achievement-popup" id="achievement-popup">
+        <div class="popup-icon">🏆</div>
+        <div class="popup-text">
+            <div class="popup-title">解锁新成就</div>
+            <div class="popup-name" id="popup-ach-name">成就名称</div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 成就配置 ====================
+        const ACHIEVEMENTS = {
+            first_play: {
+                name: '初次体验',
+                desc: '完成第一次游戏',
+                icon: '🎮'
+            },
+            all_a_endings: {
+                name: '华强专家',
+                desc: '解锁华强报仇记所有结局',
+                icon: '🔪'
+            },
+            all_b_endings: {
+                name: '自卫大师',
+                desc: '解锁老板自卫记所有结局',
+                icon: '🛡️'
+            },
+            all_c_endings: {
+                name: '助攻达人',
+                desc: '解锁小弟助攻记所有结局',
+                icon: '🤝'
+            },
+            half_endings: {
+                name: '探索者',
+                desc: '解锁超过一半结局',
+                icon: '🔍'
+            },
+            all_endings: {
+                name: '全结局收集',
+                desc: '解锁所有15个结局',
+                icon: '👑'
+            },
+            try_all_roles: {
+                name: '百变演员',
+                desc: '尝试过所有三个角色',
+                icon: '🎭'
+            },
+            speed_run: {
+                name: '速通玩家',
+                desc: '2分钟内完成一次游戏',
+                icon: '⚡'
+            },
+            ten_plays: {
+                name: '忠实粉丝',
+                desc: '完成10次游戏',
+                icon: '❤️'
+            },
+            completionist: {
+                name: '完美主义',
+                desc: '解锁所有成就',
+                icon: '💎'
+            }
+        };
+
+        // ==================== 视频树配置 ====================
+        const VIDEO_TREE = {
+            // ========== 故事A：华强报仇记 ==========
+            huaqiang_start: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_游玩__华强报仇记.mp4',
+                story: '华强报仇记',
+                choices: [
+                    { text: '开始游戏', next: 'huaqiang_gamestart' },
+                ]
+            },
+            huaqiang_gamestart: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_开始游戏.mp4',
+                choices: [
+                    { text: '拐进去', next: 'huaqiang_turnin' },
+                    { text: '不进去', next: 'huaqiang_notenter' }
+                ]
+            },
+            huaqiang_notenter: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/B_不进去/B_不进去.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_A6' }
+                ]
+            },
+            huaqiang_turnin: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_拐进去.mp4',
+                choices: [
+                    { text: '问价钱', next: 'huaqiang_askprice' },
+                    { text: '直接刺', next: 'huaqiang_stab' }
+                ]
+            },
+            huaqiang_stab: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/B_直接刺/B_直接刺.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_A5' }
+                ]
+            },
+            huaqiang_askprice: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/A_问价钱.mp4',
+                choices: [
+                    { text: "what's up", next: 'huaqiang_whatsup' },
+                    { text: '太贵，不买了', next: 'huaqiang_expensive' }
+                ]
+            },
+            huaqiang_expensive: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/B_太贵，不买了/B_太贵，不买了.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_A4' }
+                ]
+            },
+            huaqiang_whatsup: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/A_what\'s_up/A_what\'s_up.mp4',
+                choices: [
+                    { text: '不保熟就刺', next: 'huaqiang_nocook' },
+                    { text: '保熟吗', next: 'huaqiang_cook' }
+                ]
+            },
+            huaqiang_nocook: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/A_what\'s_up/A_不保熟就刺/A_不保熟就刺.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_A1' }
+                ]
+            },
+            huaqiang_cook: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/A_what\'s_up/B_保熟吗/B_保熟吗.mp4',
+                choices: [
+                    { text: '继续', next: 'huaqiang_continue' }
+                ]
+            },
+            huaqiang_continue: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/A_what\'s_up/B_保熟吗/A_继续/A_继续.mp4',
+                choices: [
+                    { text: '跑路', next: 'huaqiang_run' },
+                    { text: '不跑', next: 'huaqiang_norun' }
+                ]
+            },
+            huaqiang_run: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/A_what\'s_up/B_保熟吗/A_继续/A_跑路/A_跑路.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_A2' }
+                ]
+            },
+            huaqiang_norun: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/A_what\'s_up/B_保熟吗/A_继续/B_不跑/B_不跑.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_A3' }
+                ]
+            },
+
+            // ========== 故事B：老板自卫记 ==========
+            boss_start: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/B_游玩__老板自卫记.mp4',
+                story: '老板自卫记',
+                choices: [
+                    { text: 'say价格', next: 'boss_sayprice' },
+                    { text: '偷偷报警', next: 'boss_callpolice' },
+                    { text: '自杀', next: 'boss_suicide' }
+                ]
+            },
+            boss_suicide: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/C_自杀/C_自杀.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_B6' }
+                ]
+            },
+            boss_sayprice: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/A_say价格/A_say价格.mp4',
+                choices: [
+                    { text: '直接挑瓜', next: 'boss_pick' },
+                    { text: '仔细挑瓜', next: 'boss_careful' }
+                ]
+            },
+            boss_careful: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/A_say价格/B_仔细挑瓜/B_仔细挑瓜.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_B3' }
+                ]
+            },
+            boss_pick: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/A_say价格/A_直接挑瓜/A_直接挑瓜.mp4',
+                choices: [
+                    { text: '生气', next: 'boss_angry' },
+                    { text: '搏斗', next: 'boss_fight' }
+                ]
+            },
+            boss_angry: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/A_say价格/A_直接挑瓜/A_生气/A_生气.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_B1' }
+                ]
+            },
+            boss_fight: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/A_say价格/A_直接挑瓜/B_搏斗/B_搏斗.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_B2' }
+                ]
+            },
+            boss_callpolice: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/B_偷偷报警/B_偷偷报警.mp4',
+                choices: [
+                    { text: '说价格', next: 'boss_sayprice2' }
+                ]
+            },
+            boss_sayprice2: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/B_偷偷报警/A_说价格/A_说价格.mp4',
+                choices: [
+                    { text: '直接挑瓜', next: 'boss_pick2' },
+                    { text: '拖延时间', next: 'boss_delay' }
+                ]
+            },
+            boss_pick2: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/B_偷偷报警/A_说价格/A_直接挑瓜/A_直接挑瓜.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_B4' }
+                ]
+            },
+            boss_delay: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/B_偷偷报警/A_说价格/B_拖延时间/B_拖延时间.mp4',
+                choices: [
+                    { text: '继续', next: 'boss_continue' }
+                ]
+            },
+            boss_continue: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/B_偷偷报警/A_说价格/B_拖延时间/A_继续/A_继续.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_B5' }
+                ]
+            },
+
+            // ========== 故事C：小弟助攻记 ==========
+            bro_start: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/C_游玩__小弟助攻记.mp4',
+                story: '小弟助攻记',
+                choices: [
+                    { text: '开始吧', next: 'bro_startgame' }
+                ]
+            },
+            bro_startgame: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/A_开始吧.mp4',
+                choices: [
+                    { text: '提醒警惕', next: 'bro_remind' },
+                    { text: '跳过本轮选择', next: 'bro_skip' }
+                ]
+            },
+            bro_remind: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/A_提醒警惕/A_提醒警惕.mp4',
+                choices: [
+                    { text: '跳过本轮选择', next: 'bro_skip2' },
+                    { text: '提醒报警', next: 'bro_callpolice' }
+                ]
+            },
+            bro_callpolice: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/A_提醒警惕/B_提醒报警/B_提醒报警.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_C3' }
+                ]
+            },
+            bro_skip: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/B_跳过本轮选择/B_跳过本轮选择.mp4',
+                choices: [
+                    { text: '追华强', next: 'bro_chase' },
+                    { text: '反捅一刀', next: 'bro_stab' }
+                ]
+            },
+            bro_skip2: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/A_提醒警惕/A_跳过本轮选择/A_跳过本轮选择.mp4',
+                choices: [
+                    { text: '追华强', next: 'bro_chase2' },
+                    { text: '反捅一刀', next: 'bro_stab2' }
+                ]
+            },
+            bro_chase: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/B_跳过本轮选择/A_追华强/A_追华强.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_C4' }
+                ]
+            },
+            bro_stab: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/B_跳过本轮选择/B_反捅一刀/B_反捅一刀.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_C5' }
+                ]
+            },
+            bro_chase2: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/A_提醒警惕/A_跳过本轮选择/A_追华强/A_追华强.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_C1' }
+                ]
+            },
+            bro_stab2: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/A_提醒警惕/A_跳过本轮选择/B_反捅一刀/B_反捅一刀.mp4',
+                choices: [
+                    { text: '观看结局', next: 'ending_C2' }
+                ]
+            },
+
+            // ========== 结局节点 ==========
+            ending_A1: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/A_what\'s_up/A_不保熟就刺/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'A1',
+                endingName: '华强报仇记 - 结局一',
+                endingDesc: '不保熟就刺，直接动手'
+            },
+            ending_A2: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/A_what\'s_up/B_保熟吗/A_继续/A_跑路/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'A2',
+                endingName: '华强报仇记 - 结局二',
+                endingDesc: '见势不妙，溜了溜了'
+            },
+            ending_A3: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/A_what\'s_up/B_保熟吗/A_继续/B_不跑/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'A3',
+                endingName: '华强报仇记 - 结局三',
+                endingDesc: '硬刚到底，两败俱伤'
+            },
+            ending_A4: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/A_问价钱/B_太贵，不买了/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'A4',
+                endingName: '华强报仇记 - 结局四',
+                endingDesc: '太贵不买了，告辞'
+            },
+            ending_A5: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/A_拐进去/B_直接刺/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'A5',
+                endingName: '华强报仇记 - 结局五',
+                endingDesc: '二话不说，直接开刺'
+            },
+            ending_A6: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/A_游玩__华强报仇记/A_开始游戏/B_不进去/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'A6',
+                endingName: '华强报仇记 - 结局六',
+                endingDesc: '不进去，改天再来'
+            },
+            ending_B1: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/A_say价格/A_直接挑瓜/A_生气/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'B1',
+                endingName: '老板自卫记 - 结局一',
+                endingDesc: '生气对峙，场面失控'
+            },
+            ending_B2: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/A_say价格/A_直接挑瓜/B_搏斗/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'B2',
+                endingName: '老板自卫记 - 结局二',
+                endingDesc: '搏斗反击，自卫成功'
+            },
+            ending_B3: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/A_say价格/B_仔细挑瓜/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'B3',
+                endingName: '老板自卫记 - 结局三',
+                endingDesc: '仔细挑瓜，化解危机'
+            },
+            ending_B4: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/B_偷偷报警/A_说价格/A_直接挑瓜/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'B4',
+                endingName: '老板自卫记 - 结局四',
+                endingDesc: '报警求助，正义必胜'
+            },
+            ending_B5: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/B_偷偷报警/A_说价格/B_拖延时间/A_继续/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'B5',
+                endingName: '老板自卫记 - 结局五',
+                endingDesc: '拖延时间，警察赶到'
+            },
+            ending_B6: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/B_游玩__老板自卫记/C_自杀/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'B6',
+                endingName: '老板自卫记 - 结局六',
+                endingDesc: '压力太大，选择自杀'
+            },
+            ending_C1: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/A_提醒警惕/A_跳过本轮选择/A_追华强/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'C1',
+                endingName: '小弟助攻记 - 结局一',
+                endingDesc: '追华强，助攻成功'
+            },
+            ending_C2: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/A_提醒警惕/A_跳过本轮选择/B_反捅一刀/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'C2',
+                endingName: '小弟助攻记 - 结局二',
+                endingDesc: '反捅一刀，局势逆转'
+            },
+            ending_C3: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/A_提醒警惕/B_提醒报警/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'C3',
+                endingName: '小弟助攻记 - 结局三',
+                endingDesc: '提醒报警，机智助攻'
+            },
+            ending_C4: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/B_跳过本轮选择/A_追华强/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'C4',
+                endingName: '小弟助攻记 - 结局四',
+                endingDesc: '直接追华强，简单粗暴'
+            },
+            ending_C5: {
+                video: '【互动视频】卖瓜合集2.0，选择你的角色（包含小弟）点进即可游玩/C_游玩__小弟助攻记/A_开始吧/B_跳过本轮选择/B_反捅一刀/A_结局/A_结局.mp4',
+                isEnding: true,
+                endingId: 'C5',
+                endingName: '小弟助攻记 - 结局五',
+                endingDesc: '直接反捅，狠人一个'
+            }
+        };
+
+        // ==================== 游戏核心逻辑 ====================
+        class InteractiveVideoGame {
+            constructor() {
+                this.video = document.getElementById('main-video');
+                this.choicePanel = document.getElementById('choice-panel');
+                this.choiceButtons = document.getElementById('choice-buttons');
+                this.endingPanel = document.getElementById('ending-panel');
+                this.homeScreen = document.getElementById('home-screen');
+                this.roleSelect = document.getElementById('role-select');
+                this.gameScreen = document.getElementById('game-screen');
+                this.progressBar = document.getElementById('progress-bar');
+                this.videoControls = document.getElementById('video-controls');
+                this.btnSkip = document.getElementById('btn-skip');
+                this.btnBackStepVideo = document.getElementById('btn-back-step-video');
+                this.btnBackStep = document.getElementById('btn-back-step');
+                
+                this.currentNode = '';
+                this.currentStory = '';
+                this.startTime = null;
+                this.history = [];
+                this.isVideoPlaying = false;
+                
+                this.saveData = {
+                    unlockedEndings: new Set(),
+                    unlockedAchievements: new Set(),
+                    selectedChoices: new Set(),
+                    playedRoles: new Set(),
+                    playCount: 0
+                };
+                
+                this.init();
+            }
+
+            init() {
+                document.getElementById('btn-start').addEventListener('click', () => this.showRoleSelect());
+                document.getElementById('btn-achievements').addEventListener('click', () => this.showAchievements());
+                document.getElementById('btn-reset').addEventListener('click', () => this.resetProgress());
+                document.getElementById('btn-back').addEventListener('click', () => this.backToHome());
+                document.getElementById('btn-restart').addEventListener('click', () => this.restart());
+                document.getElementById('btn-menu').addEventListener('click', () => this.backToMenu());
+                document.getElementById('btn-ach-close').addEventListener('click', () => this.hideAchievements());
+
+                document.querySelectorAll('.role-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const role = card.dataset.role;
+                        this.selectRole(role);
+                    });
+                });
+
+                this.video.addEventListener('ended', () => {
+                    this.isVideoPlaying = false;
+                    this.onVideoEnded();
+                });
+
+                this.video.addEventListener('play', () => {
+                    this.isVideoPlaying = true;
+                });
+
+                this.video.addEventListener('pause', () => {
+                    this.isVideoPlaying = false;
+                });
+
+                this.btnSkip.addEventListener('click', () => this.skipVideo());
+                this.btnBackStepVideo.addEventListener('click', () => this.goBack());
+                this.btnBackStep.addEventListener('click', () => this.goBack());
+
+                this.loadSave();
+                this.updateHomeStats();
+            }
+
+            showRoleSelect() {
+                this.homeScreen.classList.add('hidden');
+                this.roleSelect.classList.add('active');
+            }
+
+            backToHome() {
+                this.roleSelect.classList.remove('active');
+                this.homeScreen.classList.remove('hidden');
+            }
+
+            selectRole(role) {
+                this.roleSelect.classList.remove('active');
+                this.gameScreen.classList.add('active');
+                
+                const roleMap = {
+                    huaqiang: 'huaqiang_start',
+                    boss: 'boss_start',
+                    bro: 'bro_start'
+                };
+                
+                this.currentNode = roleMap[role];
+                this.history = [];
+                this.saveData.playedRoles.add(role);
+                
+                const node = VIDEO_TREE[this.currentNode];
+                this.currentStory = node.story || '未知';
+                this.startTime = Date.now();
+                this.saveData.playCount++;
+                
+                this.updateStats();
+                this.updateBackButtons();
+                this.playVideo(node.video);
+            }
+
+            playVideo(src) {
+                this.choicePanel.classList.add('hidden');
+                this.videoControls.classList.add('always-show');
+                this.btnSkip.disabled = false;
+                this.video.src = src;
+                this.video.play().catch(err => {
+                    console.error('视频播放失败:', err);
+                    this.isVideoPlaying = false;
+                    this.onVideoEnded();
+                });
+            }
+
+            skipVideo() {
+                if (this.video.readyState >= 1) {
+                    this.video.pause();
+                    this.video.currentTime = this.video.duration || 0;
+                    this.isVideoPlaying = false;
+                    this.onVideoEnded();
+                }
+            }
+
+            onVideoEnded() {
+                this.videoControls.classList.remove('always-show');
+                this.btnSkip.disabled = true;
+                const node = VIDEO_TREE[this.currentNode];
+                
+                if (node.isEnding) {
+                    this.showEnding(node);
+                } else if (node.choices) {
+                    this.showChoices(node);
+                }
+            }
+
+            showChoices(node) {
+                this.choiceButtons.innerHTML = '';
+                
+                node.choices.forEach((choice, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    
+                    const choiceKey = `${this.currentNode}_${index}`;
+                    const isSelected = this.saveData.selectedChoices.has(choiceKey);
+                    
+                    if (isSelected) {
+                        btn.classList.add('selected');
+                    }
+                    
+                    let selectedTag = '';
+                    if (isSelected) {
+                        selectedTag = '<span class="selected-tag">✓ 已选过</span>';
+                    }
+                    
+                    btn.innerHTML = `
+                        <div class="choice-number">${index + 1}</div>
+                        <span>${choice.text}</span>
+                        ${selectedTag}
+                    `;
+                    
+                    btn.addEventListener('click', () => {
+                        this.saveData.selectedChoices.add(choiceKey);
+                        this.makeChoice(choice);
+                    });
+                    
+                    this.choiceButtons.appendChild(btn);
+                });
+                
+                this.updateBackButtons();
+                this.choicePanel.classList.remove('hidden');
+            }
+
+            makeChoice(choice) {
+                this.history.push(this.currentNode);
+                this.currentNode = choice.next;
+                const nextNode = VIDEO_TREE[this.currentNode];
+                
+                this.updateStats();
+                this.updateBackButtons();
+                this.playVideo(nextNode.video);
+            }
+
+            goBack() {
+                if (this.history.length === 0) return;
+                
+                this.video.pause();
+                this.choicePanel.classList.add('hidden');
+                this.endingPanel.classList.remove('active');
+                
+                this.currentNode = this.history.pop();
+                const node = VIDEO_TREE[this.currentNode];
+                
+                this.updateStats();
+                this.updateBackButtons();
+                this.playVideo(node.video);
+            }
+
+            updateBackButtons() {
+                const canGoBack = this.history.length > 0;
+                this.btnBackStep.disabled = !canGoBack;
+                this.btnBackStepVideo.disabled = !canGoBack;
+            }
+
+            showEnding(node) {
+                this.saveData.unlockedEndings.add(node.endingId);
+                this.checkAchievements();
+                this.saveProgress();
+                
+                document.getElementById('ending-title').textContent = node.endingName;
+                document.getElementById('ending-description').textContent = node.endingDesc;
+                this.endingPanel.classList.add('active');
+                
+                this.updateStats();
+                this.updateHomeStats();
+            }
+
+            checkAchievements() {
+                const newAchievements = [];
+                const data = this.saveData;
+                const endings = data.unlockedEndings;
+                
+                if (data.playCount >= 1 && !data.unlockedAchievements.has('first_play')) {
+                    data.unlockedAchievements.add('first_play');
+                    newAchievements.push('first_play');
+                }
+                
+                const aEndings = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6'];
+                if (aEndings.every(e => endings.has(e)) && !data.unlockedAchievements.has('all_a_endings')) {
+                    data.unlockedAchievements.add('all_a_endings');
+                    newAchievements.push('all_a_endings');
+                }
+                
+                const bEndings = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6'];
+                if (bEndings.every(e => endings.has(e)) && !data.unlockedAchievements.has('all_b_endings')) {
+                    data.unlockedAchievements.add('all_b_endings');
+                    newAchievements.push('all_b_endings');
+                }
+                
+                const cEndings = ['C1', 'C2', 'C3', 'C4', 'C5'];
+                if (cEndings.every(e => endings.has(e)) && !data.unlockedAchievements.has('all_c_endings')) {
+                    data.unlockedAchievements.add('all_c_endings');
+                    newAchievements.push('all_c_endings');
+                }
+                
+                if (endings.size >= 8 && !data.unlockedAchievements.has('half_endings')) {
+                    data.unlockedAchievements.add('half_endings');
+                    newAchievements.push('half_endings');
+                }
+                
+                if (endings.size >= 15 && !data.unlockedAchievements.has('all_endings')) {
+                    data.unlockedAchievements.add('all_endings');
+                    newAchievements.push('all_endings');
+                }
+                
+                if (data.playedRoles.size >= 3 && !data.unlockedAchievements.has('try_all_roles')) {
+                    data.unlockedAchievements.add('try_all_roles');
+                    newAchievements.push('try_all_roles');
+                }
+                
+                const playTime = (Date.now() - this.startTime) / 1000;
+                if (playTime <= 120 && !data.unlockedAchievements.has('speed_run')) {
+                    data.unlockedAchievements.add('speed_run');
+                    newAchievements.push('speed_run');
+                }
+                
+                if (data.playCount >= 10 && !data.unlockedAchievements.has('ten_plays')) {
+                    data.unlockedAchievements.add('ten_plays');
+                    newAchievements.push('ten_plays');
+                }
+                
+                if (data.unlockedAchievements.size >= 9 && !data.unlockedAchievements.has('completionist')) {
+                    data.unlockedAchievements.add('completionist');
+                    newAchievements.push('completionist');
+                }
+                
+                newAchievements.forEach(id => {
+                    this.showAchievementPopup(id);
+                });
+            }
+
+            showAchievementPopup(achId) {
+                const ach = ACHIEVEMENTS[achId];
+                const popup = document.getElementById('achievement-popup');
+                document.getElementById('popup-ach-name').textContent = ach.name;
+                
+                popup.classList.add('show');
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                }, 3000);
+            }
+
+            restart() {
+                this.endingPanel.classList.remove('active');
+                this.gameScreen.classList.remove('active');
+                this.homeScreen.classList.remove('hidden');
+                this.currentNode = '';
+                this.currentStory = '';
+                this.history = [];
+                this.video.pause();
+                this.video.src = '';
+            }
+
+            backToMenu() {
+                this.endingPanel.classList.remove('active');
+                this.gameScreen.classList.remove('active');
+                this.homeScreen.classList.remove('hidden');
+                this.currentNode = '';
+                this.currentStory = '';
+                this.history = [];
+                this.video.pause();
+                this.video.src = '';
+            }
+
+            updateStats() {
+                document.getElementById('current-story').textContent = this.currentStory || '未选择';
+                document.getElementById('ending-count').textContent = `${this.saveData.unlockedEndings.size}/15`;
+                document.getElementById('achievement-count').textContent = `${this.saveData.unlockedAchievements.size}/10`;
+                
+                const progress = (this.saveData.unlockedEndings.size / 15) * 100;
+                this.progressBar.style.width = `${progress}%`;
+            }
+
+            updateHomeStats() {
+                document.getElementById('home-ending-count').textContent = this.saveData.unlockedEndings.size;
+                document.getElementById('home-achievement-count').textContent = this.saveData.unlockedAchievements.size;
+                document.getElementById('home-play-count').textContent = this.saveData.playCount;
+            }
+
+            showAchievements() {
+                const grid = document.getElementById('achievement-grid');
+                grid.innerHTML = '';
+                
+                Object.entries(ACHIEVEMENTS).forEach(([id, ach]) => {
+                    const isUnlocked = this.saveData.unlockedAchievements.has(id);
+                    const item = document.createElement('div');
+                    item.className = `achievement-item ${isUnlocked ? 'unlocked' : 'locked'}`;
+                    item.innerHTML = `
+                        <div class="ach-icon">${ach.icon}</div>
+                        <div class="ach-name">${ach.name}</div>
+                        <div class="ach-desc">${ach.desc}</div>
+                    `;
+                    grid.appendChild(item);
+                });
+                
+                this.homeScreen.classList.add('hidden');
+                document.getElementById('achievement-panel').classList.add('active');
+            }
+
+            hideAchievements() {
+                document.getElementById('achievement-panel').classList.remove('active');
+                this.homeScreen.classList.remove('hidden');
+            }
+
+            saveProgress() {
+                const data = {
+                    unlockedEndings: Array.from(this.saveData.unlockedEndings),
+                    unlockedAchievements: Array.from(this.saveData.unlockedAchievements),
+                    selectedChoices: Array.from(this.saveData.selectedChoices),
+                    playedRoles: Array.from(this.saveData.playedRoles),
+                    playCount: this.saveData.playCount
+                };
+                localStorage.setItem('melon_save_v3', JSON.stringify(data));
+            }
+
+            loadSave() {
+                const raw = localStorage.getItem('melon_save_v3');
+                if (raw) {
+                    const data = JSON.parse(raw);
+                    this.saveData.unlockedEndings = new Set(data.unlockedEndings || []);
+                    this.saveData.unlockedAchievements = new Set(data.unlockedAchievements || []);
+                    this.saveData.selectedChoices = new Set(data.selectedChoices || []);
+                    this.saveData.playedRoles = new Set(data.playedRoles || []);
+                    this.saveData.playCount = data.playCount || 0;
+                }
+            }
+
+            resetProgress() {
+                if (confirm('确定要重置所有进度吗？')) {
+                    localStorage.removeItem('melon_save_v3');
+                    this.saveData = {
+                        unlockedEndings: new Set(),
+                        unlockedAchievements: new Set(),
+                        selectedChoices: new Set(),
+                        playedRoles: new Set(),
+                        playCount: 0
+                    };
+                    this.updateHomeStats();
+                    alert('进度已重置');
+                }
+            }
+        }
+
+        // 启动游戏
+        const game = new InteractiveVideoGame();
+    </script>
+</body>
 </html>
